@@ -1,5 +1,4 @@
 from flask import Flask, flash, redirect, render_template, request, session
-from functools import wraps
 from passlib.hash import sha256_crypt
 from tinydb import TinyDB, Query
 
@@ -19,11 +18,11 @@ def on_first_user():
 
 @app.route("/")
 def index():
-    return app.send_static_file("index.html")
+    return render_template("index.html")
 
 @app.route("/dashboard")
 def dashboard():
-    if session["logged_in"] == False:
+    if "logged_in" not in session:
         flash("Please log in to continue")
         return redirect("/login")
 
@@ -31,7 +30,7 @@ def dashboard():
 
 @app.route("/register", methods=["GET","POST"])
 def register():
-    if session["logged_in"] == True:
+    if "logged_in" in session:
         flash("Already logged in!")
         return redirect("/dashboard")
 
@@ -52,7 +51,7 @@ def register():
 
 @app.route("/login", methods=["GET","POST"])
 def login():
-    if session["logged_in"] == True:
+    if "logged_in" in session:
         flash("Already logged in!")
         return redirect("/dashboard")
 
@@ -64,7 +63,17 @@ def login():
             if sha256_crypt.verify(form.username.data + str(form.password.data), user["password"]):
                 session["logged_in"] = True
                 session["user"] = user["username"]
-                return redirect("/")
+                return redirect("/dashboard")
         flash("Invalid credentials!")
 
     return render_template("login.html", form=form)
+
+@app.route("/logout")
+def logout():
+    if "logged_in" not in session:
+        flash("Silly! You can't logout if you aren't logged in :P")
+        return redirect("/login")
+
+    session.clear()
+    flash("You are now logged out!")
+    return redirect("/")

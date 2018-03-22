@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Hello! Velcome to Vodka Bets!</h1>
+  {% include 'includes/_messages.html' %}
+  <p>CYKABLYATCYKABLYATCYKABLYATCYKABLYATCYKABLYAT</p>
+  {% if "logged_in" not in session %}
+    <a href="/login">Log-in</a>
+    <a href="/register">Sign-up</a>
+  {% else %}
+    <a href="/logout">Logout</a>
+  {% endif %}
+{% endblock %}
