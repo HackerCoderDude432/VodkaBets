@@ -1,0 +1,12 @@
+# pycache
+__pycache__
+
+# IDE shit
+.idea
+.vscode
+
+# Virtualenv
+env
+
+# Database
+db.json

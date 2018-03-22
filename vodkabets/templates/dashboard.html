@@ -1,0 +1,7 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  {% include 'includes/_messages.html' %}
+  <h1>Dashboard</h1>
+  <p>Welcome, {{session["user"]}}!</p>
+{% endblock %}
