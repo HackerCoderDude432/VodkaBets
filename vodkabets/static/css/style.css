@@ -1,0 +1,15 @@
+html {
+  background-color: #2d2d2d;
+}
+
+body, div {
+  margin: 0;
+  padding: 0;
+}
+
+.menubar {
+    flex: 0 1 auto;
+    width: 200px;
+    min-height: 100vh;
+    background: #000000;
+}

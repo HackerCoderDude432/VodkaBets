@@ -2,8 +2,18 @@
 <html>
   <head>
     <title>Vodka Bets</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
   </head>
   <body>
-    {% block body %}{% endblock %}
+    <div style="display: flex; flex-flow: row; height: 100%;">
+      {# Menu Bar #}
+      <div class="menubar">
+        <img src="/static/images/logo.png" style="max-width:100%;max-height:100%;"></img>
+      </div>
+      {# Main Content #}
+      <div style="flex: 1 1 auto;">
+        {% block main %}{% endblock %}
+      </div>
+    </div>
   </body>
 </html>
