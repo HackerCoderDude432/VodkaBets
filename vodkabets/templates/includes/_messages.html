@@ -1,10 +1,39 @@
-{# Messages from the flash function #}
-{% with messages = get_flashed_messages() %}
+{# Messages from the flash function (displayed using toastr) #}
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+{% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message|safe }}</li>
-    {% endfor %}
-    </ul>
+    <script>
+      toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-full-width",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+      }
+
+      {% for catagory, message in messages %}
+        {% if catagory.lower() == "success" %}
+          toastr.success("{{ message }}", "{{ catagory }}")
+        {% elif catagory.lower() == "warning" %}
+          toastr.warning("{{ message }}", "{{ catagory }}")
+        {% elif catagory.lower() == "error" %}
+          toastr.error("{{ message }}", "{{ catagory }}")
+        {% else %}
+          toastr.info("{{ message }}", "{{ catagory }}")
+        {% endif %}
+      {% endfor %}
+    </script>
   {% endif %}
 {% endwith %}

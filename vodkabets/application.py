@@ -23,7 +23,7 @@ def index():
 @app.route("/dashboard")
 def dashboard():
     if "logged_in" not in session:
-        flash("Please log in to continue")
+        flash("Please log in to continue", "ERROR")
         return redirect("/login")
 
     return render_template("dashboard.html")
@@ -31,7 +31,7 @@ def dashboard():
 @app.route("/register", methods=["GET","POST"])
 def register():
     if "logged_in" in session:
-        flash("Already logged in!")
+        flash("Already logged in!", "INFO")
         return redirect("/dashboard")
 
     form = RegisterForm(request.form)
@@ -42,17 +42,17 @@ def register():
 
             #entry = User(username, password)
             creds.insert({"username": username, "password": password, "items": None})
-            flash("Registered user!")
+            flash("Registered user!", "SUCCESS")
             return redirect("/login")
         else:
-            flash("Username Already Registered! Do you want to <a href='/login'>login?</a>")
+            flash("Username Already Registered!", "ERROR")
 
     return render_template("register.html", form=form)
 
 @app.route("/login", methods=["GET","POST"])
 def login():
     if "logged_in" in session:
-        flash("Already logged in!")
+        flash("Already logged in!", "ERROR")
         return redirect("/dashboard")
 
     form = LoginForm(request.form)
@@ -63,17 +63,18 @@ def login():
             if sha256_crypt.verify(form.username.data + str(form.password.data), user["password"]):
                 session["logged_in"] = True
                 session["user"] = user["username"]
+                flash("Sucessfully logged in!", "SUCCESS")
                 return redirect("/dashboard")
-        flash("Invalid credentials!")
+        flash("Invalid credentials!", "ERROR")
 
     return render_template("login.html", form=form)
 
 @app.route("/logout")
 def logout():
     if "logged_in" not in session:
-        flash("Silly! You can't logout if you aren't logged in :P")
+        flash("Silly! You can't logout if you aren't logged in :P", "ERROR")
         return redirect("/login")
 
     session.clear()
-    flash("You are now logged out!")
+    flash("You are now logged out!", "SUCCESS")
     return redirect("/")
