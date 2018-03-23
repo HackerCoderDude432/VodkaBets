@@ -1,10 +1,26 @@
 html {
-  background-color: #2d2d2d;
+  background-color: #303030;
+}
+
+* {
+  font-family: sans-serif;
+}
+
+body {
+  color: white;
 }
 
 body, div {
   margin: 0;
   padding: 0;
+}
+
+a {
+  color: DodgerBlue;
+}
+
+a:hover {
+  color: gray;
 }
 
 .menubar {
