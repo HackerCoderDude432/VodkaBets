@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-  {% include 'includes/_messages.html' %}
+  {% include 'includes/_toastr_messages.html' %}
   <h1>Dashboard</h1>
   <p>Welcome, {{session["user"]}}!</p>
 {% endblock %}

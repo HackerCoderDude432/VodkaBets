@@ -3,6 +3,7 @@
   <head>
     <title>Vodka Bets</title>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
     <div style="display: flex; flex-flow: row;">
@@ -13,19 +14,19 @@
 
         {# Top Buttons #}
         <div style="flex: 2;padding: 5px;">
-          <button class="menubutton" type="button" onclick="window.location.href='/'">Home</button>
+          <button class="menubutton" type="button" onclick="$(location).attr('href', '/')">Home</button>
         </div>
         {# Bottom Buttons #}
         <div style="padding: 5px;">
           {% if "logged_in" in session %}
-            <button class="menubutton" onclick="window.location.href='/dashboard'">Dashboard</button>
-            <button class="menubutton" onclick="window.location.href='/logout'">Sign-out</button>
+            <button class="menubutton" onclick="$(location).attr('href', '/dashboard')">Dashboard</button>
+            <button class="menubutton" onclick="$(location).attr('href', '/logout')">Sign-out</button>
           {% else %}
-            <button class="menubutton" onclick="window.location.href='/login'">Login</button>
-            <button class="menubutton" onclick="window.location.href='/register'">Sign-up</button>
+            <button class="menubutton" onclick="$(location).attr('href', '/login')">Login</button>
+            <button class="menubutton" onclick="$(location).attr('href', '/register')">Sign-up</button>
           {% endif %}
           <hr>
-          <button class="menubutton" type="button">Credits/About</button>
+          <button class="menubutton" type="button" onclick="$('#credits').show()">Credits/About</button>
         </div>
       </div>
       {# Main Content #}
