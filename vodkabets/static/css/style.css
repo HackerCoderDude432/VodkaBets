@@ -1,5 +1,5 @@
 html {
-  background-color: #303030;
+  background-color: #222324;
 }
 
 * {
@@ -25,7 +25,21 @@ a:hover {
 
 .menubar {
     flex: 0 1 auto;
-    width: 200px;
+    width: 250px;
     min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-flow: column;
     background: #000000;
+}
+
+.menubutton {
+  width: 100%;
+  min-height: 30px;
+  border-radius: 4px;
+  border-color: #373737;
+  background-color: #373737;
+  color: white;
+  font-size: 14px;
 }
