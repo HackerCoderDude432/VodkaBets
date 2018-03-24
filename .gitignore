@@ -8,5 +8,6 @@ __pycache__
 # Virtualenv
 env
 
-# Database
+# Configuration/Databases
+instance/
 db.json

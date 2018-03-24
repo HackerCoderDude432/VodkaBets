@@ -8,8 +8,8 @@ from vodkabets.forms.register_form import RegisterForm
 db = TinyDB("db.json")
 creds = db.table(name="creds")
 
-app = Flask(__name__)
-app.secret_key = "This iS a Secret!"
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_json("config.json")
 
 @app.before_request
 def on_first_user():
@@ -35,7 +35,7 @@ def register():
         return redirect("/dashboard")
 
     form = RegisterForm(request.form)
-    if request.method == "POST" and form.validate():
+    if form.validate_on_submit():
         username = form.username.data
         if not creds.contains(Query().username == username):
             password = sha256_crypt.encrypt(form.username.data + str(form.password.data))
@@ -56,7 +56,7 @@ def login():
         return redirect("/dashboard")
 
     form = LoginForm(request.form)
-    if request.method == "POST" and form.validate():
+    if form.validate_on_submit():
         user = creds.get(Query().username == form.username.data)
         if user:
             # validate password
