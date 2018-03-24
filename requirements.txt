@@ -1,9 +1,11 @@
 click==6.7
 Flask==0.12.2
+Flask-Login==0.4.1
+Flask-WTF==0.14.2
 itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
 passlib==1.7.1
-tinydb==3.8.0
+peewee==3.1.5
 Werkzeug==0.14.1
 WTForms==2.1

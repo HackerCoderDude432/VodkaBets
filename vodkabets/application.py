@@ -1,15 +1,22 @@
+import os
+
 from flask import Flask, flash, redirect, render_template, request, session
 from passlib.hash import sha256_crypt
-from tinydb import TinyDB, Query
+from peewee import SqliteDatabase
 
 from vodkabets.forms.login_form import LoginForm
 from vodkabets.forms.register_form import RegisterForm
 
-db = TinyDB("db.json")
-creds = db.table(name="creds")
+from vodkabets.models.base_model import set_model_database
+from vodkabets.models.user import User
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_json("config.json")
+
+# initialize database
+db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
+set_model_database(db) # Assign this table to the base model
+db.create_tables([User])
 
 @app.before_request
 def on_first_user():
@@ -37,11 +44,11 @@ def register():
     form = RegisterForm(request.form)
     if form.validate_on_submit():
         username = form.username.data
-        if not creds.contains(Query().username == username):
+        if not User.select().where(User.username == username).exists():
             password = sha256_crypt.encrypt(form.username.data + str(form.password.data))
 
             #entry = User(username, password)
-            creds.insert({"username": username, "password": password, "items": None})
+            User.create(username=username, password=password)
             flash("Registered user!", "SUCCESS")
             return redirect("/login")
         else:
@@ -57,12 +64,12 @@ def login():
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        user = creds.get(Query().username == form.username.data)
+        user = User.select().where(User.username == form.username.data).get()
         if user:
             # validate password
-            if sha256_crypt.verify(form.username.data + str(form.password.data), user["password"]):
+            if sha256_crypt.verify(form.username.data + str(form.password.data), user.password):
                 session["logged_in"] = True
-                session["user"] = user["username"]
+                session["user"] = user.username
                 flash("Sucessfully logged in!", "SUCCESS")
                 return redirect("/dashboard")
         flash("Invalid credentials!", "ERROR")
