@@ -1,8 +1,8 @@
 import os
 
 from flask import Flask, flash, redirect, render_template, request, session
-from passlib.hash import sha256_crypt
 from peewee import SqliteDatabase
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from vodkabets.forms.login_form import LoginForm
 from vodkabets.forms.register_form import RegisterForm
@@ -45,9 +45,8 @@ def register():
     if form.validate_on_submit():
         username = form.username.data
         if not User.select().where(User.username == username).exists():
-            password = sha256_crypt.encrypt(form.username.data + str(form.password.data))
+            password = generate_password_hash(form.password.data, salt_length=15)
 
-            #entry = User(username, password)
             User.create(username=username, password=password)
             flash("Registered user!", "SUCCESS")
             return redirect("/login")
@@ -67,7 +66,7 @@ def login():
         user = User.select().where(User.username == form.username.data).get()
         if user:
             # validate password
-            if sha256_crypt.verify(form.username.data + str(form.password.data), user.password):
+            if check_password_hash(user.password, form.password.data):
                 session["logged_in"] = True
                 session["user"] = user.username
                 flash("Sucessfully logged in!", "SUCCESS")

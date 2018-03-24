@@ -24,3 +24,5 @@ print("Generated 'instance' directory")
 with open(os.path.join(instance_folder, "config.json"), "w") as cfg:
     cfg.write(config)
 print("Generated config file")
+
+print("NOTE: Databases are generated on first-run of website")
