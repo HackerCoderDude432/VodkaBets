@@ -6,6 +6,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
+    {% include 'includes/_toastr_messages.html' %}
     <div style="display: flex; flex-flow: row;">
       {% include 'credits.html' %}
       {# Menu Bar #}
@@ -19,7 +20,7 @@
         </div>
         {# Bottom Buttons #}
         <div style="padding: 5px;">
-          {% if "logged_in" in session %}
+          {% if current_user.is_authenticated %}
             <button class="menubutton" onclick="$(location).attr('href', '/dashboard')">Dashboard</button>
             <button class="menubutton" onclick="$(location).attr('href', '/logout')">Sign-out</button>
           {% else %}

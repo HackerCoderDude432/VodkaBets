@@ -1,9 +1,13 @@
-{% macro render_field(field) %}
-  {{ field.label }}<br>
-  {{ field(size=20) }}<br>
+{% macro render_field(field, length=25, one_line=False) %}
+  {{ field.label }}
+  {% if not one_line %}
+    <br>
+  {% endif %}
+  {{ field(size=length) }}
   {% if field.errors %}
     {% for error in field.errors %}
-      <span>{{ error }}</span>
+      <span> {{ error }}</span>
     {% endfor %}
   {% endif %}
+  <br>
 {% endmacro %}

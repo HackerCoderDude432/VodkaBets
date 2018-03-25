@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, flash, redirect, render_template, request, session
+from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from peewee import SqliteDatabase
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -10,6 +11,8 @@ from vodkabets.forms.register_form import RegisterForm
 from vodkabets.models.base_model import set_model_database
 from vodkabets.models.user import User
 
+from vodkabets.misc.redirect import safe_redirect
+
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_json("config.json")
 
@@ -17,6 +20,23 @@ app.config.from_json("config.json")
 db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
 set_model_database(db) # Assign this table to the base model
 db.create_tables([User])
+
+# Init flask_login
+login_man = LoginManager()
+login_man.login_view = "/login"
+login_man.login_message = "Please login to continue!"
+login_man.login_message_category = "ERROR"
+login_man.session_protection = "strong"
+login_man.init_app(app)
+
+@login_man.user_loader
+def get_user(uid):
+    # check if user exists, if true return user, otherwise return None
+    query = User.select().where(User.id == uid)
+    if query.exists():
+        return query.get()
+    else:
+        return None
 
 @app.before_request
 def on_first_user():
@@ -28,17 +48,14 @@ def index():
     return render_template("index.html")
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    if "logged_in" not in session:
-        flash("Please log in to continue", "ERROR")
-        return redirect("/login")
-
     return render_template("dashboard.html")
 
 @app.route("/register", methods=["GET","POST"])
 def register():
-    if "logged_in" in session:
-        flash("Already logged in!", "INFO")
+    if current_user.is_authenticated:
+        flash("Already logged in!", "ERROR")
         return redirect("/dashboard")
 
     form = RegisterForm(request.form)
@@ -57,30 +74,33 @@ def register():
 
 @app.route("/login", methods=["GET","POST"])
 def login():
-    if "logged_in" in session:
+    if current_user.is_authenticated:
         flash("Already logged in!", "ERROR")
         return redirect("/dashboard")
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        user = User.select().where(User.username == form.username.data).get()
-        if user:
+        # check if user exists
+        query = User.select().where(User.username == form.username.data)
+        if query.exists():
+            user = query.get() # get user as they exist
+
             # validate password
             if check_password_hash(user.password, form.password.data):
-                session["logged_in"] = True
-                session["user"] = user.username
+                login_user(user, remember=form.remember_me.data)
                 flash("Sucessfully logged in!", "SUCCESS")
-                return redirect("/dashboard")
+
+                # check if there is a redirect after the login, and verify it is safe
+                target_redirect = request.args.get("next")
+                print("Redirect endpoint: " + str(target_redirect))
+                return safe_redirect(request.host_url, target_redirect, fallback="/dashboard")
         flash("Invalid credentials!", "ERROR")
 
     return render_template("login.html", form=form)
 
 @app.route("/logout")
+@login_required
 def logout():
-    if "logged_in" not in session:
-        flash("Silly! You can't logout if you aren't logged in :P", "ERROR")
-        return redirect("/login")
-
-    session.clear()
+    logout_user()
     flash("You are now logged out!", "SUCCESS")
     return redirect("/")
