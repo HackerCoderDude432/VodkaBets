@@ -7,7 +7,8 @@ Short Python script to generate the instance folder which stores the config and 
 config = \
 """{
   "SECRET_KEY": <enter_secret_key_here>,
-  "SESSION_TOKEN_LENGTH": 35
+  "SESSION_TOKEN_LENGTH": 35,
+  "SALT_LENGTH": 15
 }"""
 
 import os

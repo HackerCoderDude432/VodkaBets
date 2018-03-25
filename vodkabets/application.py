@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from peewee import SqliteDatabase
 from secrets import token_urlsafe
@@ -39,11 +39,6 @@ def get_user(token):
     else:
         return None
 
-@app.before_request
-def on_first_user():
-    # make logged in sessions last for 30 days
-    session.permenant = True
-
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -63,7 +58,8 @@ def register():
     if form.validate_on_submit():
         username = form.username.data
         if not User.select().where(User.username == username).exists():
-            password = generate_password_hash(form.password.data, salt_length=15) # password is auto-salted
+            # password is auto-salted
+            password = generate_password_hash(form.password.data, salt_length=app.config.get("SALT_LENGTH"))
 
             # (recursivly) generate first session token
             new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
@@ -109,3 +105,6 @@ def logout():
     logout_user()
     flash("You are now logged out!", "SUCCESS")
     return redirect("/")
+
+if __name__ == "__main__":
+    app.run()
