@@ -5,7 +5,8 @@ Short Python script to generate the instance folder which stores the config and 
 # Config File skeleton
 config = \
 """{
-  "SECRET_KEY": <enter_secret_key_here>
+  "SECRET_KEY": <enter_secret_key_here>,
+  "SESSION_TOKEN_LENGTH": 35
 }"""
 
 import os

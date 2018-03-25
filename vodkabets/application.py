@@ -3,6 +3,7 @@ import os
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from peewee import SqliteDatabase
+from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from vodkabets.forms.login_form import LoginForm
@@ -30,9 +31,9 @@ login_man.session_protection = "strong"
 login_man.init_app(app)
 
 @login_man.user_loader
-def get_user(uid):
+def get_user(token):
     # check if user exists, if true return user, otherwise return None
-    query = User.select().where(User.id == uid)
+    query = User.select().where(User.session_token == token)
     if query.exists():
         return query.get()
     else:
@@ -62,9 +63,14 @@ def register():
     if form.validate_on_submit():
         username = form.username.data
         if not User.select().where(User.username == username).exists():
-            password = generate_password_hash(form.password.data, salt_length=15)
+            password = generate_password_hash(form.password.data, salt_length=15) # password is auto-salted
 
-            User.create(username=username, password=password)
+            # (recursivly) generate first session token
+            new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
+            while User.select().where(User.session_token == new_token).exists():
+                new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
+
+            User.create(username=username, password=password, session_token=new_token)
             flash("Registered user!", "SUCCESS")
             return redirect("/login")
         else:
@@ -92,7 +98,6 @@ def login():
 
                 # check if there is a redirect after the login, and verify it is safe
                 target_redirect = request.args.get("next")
-                print("Redirect endpoint: " + str(target_redirect))
                 return safe_redirect(request.host_url, target_redirect, fallback="/dashboard")
         flash("Invalid credentials!", "ERROR")
 
