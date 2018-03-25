@@ -4,6 +4,9 @@
     <title>Vodka Bets</title>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    {# Chat toggle script #}
+    <script src="/static/js/chat.js"></script>
   </head>
   <body>
     {% include 'includes/_toastr_messages.html' %}
@@ -31,9 +34,18 @@
           <button class="menubutton" type="button" onclick="$('#credits').show()">Credits/About</button>
         </div>
       </div>
+
       {# Main Content #}
       <div style="flex: 1 1 auto; padding: 10px;">
         {% block main %}{% endblock %}
+      </div>
+
+      {# Chat Container #}
+      <div style="overflow-x: hidden;">
+        {# Chat #}
+          <div class="chat">
+            
+          </div>
       </div>
     </div>
   </body>

@@ -43,3 +43,10 @@ a:hover {
   color: white;
   font-size: 14px;
 }
+
+.chat {
+  width: 300px;
+  height: 100%;
+  margin-right: -250px;
+  background: white;
+}
