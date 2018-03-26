@@ -2,12 +2,15 @@ import os
 
 from flask import Flask, flash, redirect, render_template, request
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
+from flask_socketio import SocketIO
 from peewee import SqliteDatabase
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from vodkabets.forms.login_form import LoginForm
 from vodkabets.forms.register_form import RegisterForm
+
+from vodkabets.games.crash import crash_blueprint, CrashGame
 
 from vodkabets.models.base_model import set_model_database
 from vodkabets.models.user import User
@@ -16,6 +19,13 @@ from vodkabets.misc.redirect import safe_redirect
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_json("config.json")
+
+# SocketIO
+socket = SocketIO(app)
+
+# Init games
+crash = CrashGame(socket)
+app.register_blueprint(crash_blueprint, url_prefix="/crash")
 
 # initialize database
 db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
@@ -38,6 +48,11 @@ def get_user(token):
         return query.get()
     else:
         return None
+
+@app.before_first_request
+def run_on_start():
+    # Start games
+    crash.start()
 
 @app.route("/")
 def index():
@@ -107,4 +122,4 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run()
+    socket.run(app)

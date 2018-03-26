@@ -7,6 +7,8 @@
 
     {# Chat toggle script #}
     <script src="/static/js/chat.js"></script>
+
+    {% block head %}{% endblock %}
   </head>
   <body>
     {% include 'includes/_toastr_messages.html' %}
@@ -44,7 +46,7 @@
       <div style="overflow-x: hidden;">
         {# Chat #}
           <div class="chat">
-            
+
           </div>
       </div>
     </div>
