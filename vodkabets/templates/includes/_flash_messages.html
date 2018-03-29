@@ -1,0 +1,15 @@
+{# Dependencies #}
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="/static/js/flash.js"></script>
+
+{# Messages from the flash function (displayed using toastr) #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <script>
+      {% for catagory, message in messages %}
+        flash("{{ message|safe }}", "{{ catagory|safe }}")
+      {% endfor %}
+    </script>
+  {% endif %}
+{% endwith %}

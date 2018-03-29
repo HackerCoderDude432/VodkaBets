@@ -4,15 +4,16 @@
     <title>Vodka Bets</title>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.0/socket.io.min.js"></script>
+
+    {% block head %}{% endblock %}
 
     {# Chat toggle script #}
     <script src="/static/js/chat.js"></script>
-
-    {% block head %}{% endblock %}
   </head>
   <body>
-    {% include 'includes/_toastr_messages.html' %}
-    <div style="display: flex; flex-flow: row;">
+    {% include 'includes/_flash_messages.html' %}
+    <div class="container">
       {% include 'credits.html' %}
       {# Menu Bar #}
       <div class="menubar">
@@ -46,7 +47,27 @@
       <div style="overflow-x: hidden;">
         {# Chat #}
           <div class="chat">
-
+            <div class="chat_header">
+              <b>Chat (Global)</b>
+              <div style="float: right;">
+                <span id="chat_count">Online: Unknown</span>
+                <button id="chat_pin">Pin</button>
+              </div>
+            </div>
+            {# If the user isn't logged in, don't show chat #}
+            {% if current_user.is_authenticated %}
+              <div id="chat_main" class="chat_main">
+                <i>Messages will appear here!</i><br>
+              </div>
+              <div class="chat_form">
+                <textarea id="chat_input" class="chat_input" placeholder="Type something in chat..." rows="3" maxlength="255"></textarea>
+                <button id="chat_send">Send</button>
+              </div>
+            {% else %}
+              <div id="chat_main" class="chat_main">
+                <i>Please login or sign-up to use chat!</i><br>
+              </div>
+            {% endif %}
           </div>
       </div>
     </div>

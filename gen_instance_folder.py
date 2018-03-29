@@ -8,7 +8,8 @@ config = \
 """{
   "SECRET_KEY": <enter_secret_key_here>,
   "SESSION_TOKEN_LENGTH": 35,
-  "SALT_LENGTH": 15
+  "SALT_LENGTH": 15,
+  "MAX_CHAT_MESSAGE_LENGTH": 255
 }"""
 
 import os

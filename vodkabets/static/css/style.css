@@ -23,6 +23,11 @@ a:hover {
   color: gray;
 }
 
+.container {
+  display: flex;
+  flex-flow: row;
+}
+
 .menubar {
     flex: 0 1 auto;
     width: 250px;
@@ -32,6 +37,8 @@ a:hover {
     display: flex;
     flex-flow: column;
     background: #000000;
+    word-break: break-all;
+    word-wrap: break-word;
 }
 
 .menubutton {
@@ -46,7 +53,36 @@ a:hover {
 
 .chat {
   width: 300px;
-  height: 100%;
+  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   margin-right: -250px;
+  display: flex;
+  flex-flow: column;
   background: white;
+}
+
+.chat_header {
+  color: black;
+}
+
+.chat_main {
+  flex: 2;
+  overflow: hidden;
+  word-wrap: break-word;
+  background-color: #cbcbcb;
+  color: black;
+}
+
+.chat_form {
+  display: flex;
+  flex-flow: row;
+  background-color: white;
+  color: black;
+}
+
+.chat_input {
+  flex: 2;
+  overflow: auto;
+  resize: none;
 }

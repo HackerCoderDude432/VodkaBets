@@ -1,1 +1,1 @@
-var socket = io("/_crash")
+var socket = io.connect("/_crash")

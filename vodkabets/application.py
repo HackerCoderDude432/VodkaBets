@@ -1,11 +1,13 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, request
+from flask import Flask, flash, Markup, redirect, render_template, request
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from flask_socketio import SocketIO
 from peewee import SqliteDatabase
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from vodkabets.chat import Chat
 
 from vodkabets.forms.login_form import LoginForm
 from vodkabets.forms.register_form import RegisterForm
@@ -22,6 +24,9 @@ app.config.from_json("config.json")
 
 # SocketIO
 socket = SocketIO(app)
+
+# init chat
+chat = Chat(socket, max_length=app.config.get("MAX_CHAT_MESSAGE_LENGTH"))
 
 # Init games
 crash = CrashGame(socket)
@@ -71,7 +76,7 @@ def register():
 
     form = RegisterForm(request.form)
     if form.validate_on_submit():
-        username = form.username.data
+        username = Markup.escape(form.username.data)
         if not User.select().where(User.username == username).exists():
             # password is auto-salted
             password = generate_password_hash(form.password.data, salt_length=app.config.get("SALT_LENGTH"))
