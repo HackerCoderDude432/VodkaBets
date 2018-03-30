@@ -14,28 +14,8 @@ chatSocket.on("flash", (message, catagory) => {
 })
 
 $(document).ready(function() {
-  // hiding of chat panel
-  var pinned = false
-  $(".chat").mouseenter(function() {
-    $(this).stop().animate({ "margin-right": 0 }, "fast");
-  }).mouseleave(function() {
-    if (!pinned) {
-      $(this).stop().animate({ "margin-right": -250 }, "fast");
-    }
-  })
-
-  //Pin button
-  $("#chat_pin").click(function() {
-    if (!pinned) {
-      $(this).html("Unpin")
-    } else {
-      $(this).html("Pin")
-    }
-    pinned = !pinned
-  })
-
   // Code that submits the message to the server
-  $("#chat_send").click(function () {
+  $("#chat_send").click(function() {
     var message = $("#chat_input").val()
     if (message) {
       chatSocket.emit("send_message", message)

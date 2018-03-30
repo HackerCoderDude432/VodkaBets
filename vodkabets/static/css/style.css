@@ -30,7 +30,9 @@ a:hover {
 
 .menubar {
     flex: 0 1 auto;
+    min-width: 250px;
     width: 250px;
+    max-width: 250px;
     min-height: 100vh;
     height: 100vh;
     max-height: 100vh;
@@ -51,6 +53,11 @@ a:hover {
   font-size: 14px;
 }
 
+.chat_container {
+  overflow-x: hidden;
+  width: 300px;
+}
+
 .chat {
   width: 300px;
   min-height: 100vh;
@@ -63,6 +70,7 @@ a:hover {
 }
 
 .chat_header {
+  padding: 5px;
   color: black;
 }
 
