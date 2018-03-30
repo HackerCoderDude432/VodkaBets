@@ -54,7 +54,6 @@ a:hover {
 }
 
 .chat_container {
-  overflow-x: hidden;
   width: 300px;
 }
 
@@ -63,9 +62,9 @@ a:hover {
   min-height: 100vh;
   height: 100vh;
   max-height: 100vh;
-  margin-right: -250px;
   display: flex;
   flex-flow: column;
+  overflow-x: hidden;
   background: white;
 }
 
