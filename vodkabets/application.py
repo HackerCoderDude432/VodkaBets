@@ -1,13 +1,18 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, request
+from flask import Flask, flash, Markup, redirect, render_template, request
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
+from flask_socketio import SocketIO
 from peewee import SqliteDatabase
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from vodkabets.chat import Chat
+
 from vodkabets.forms.login_form import LoginForm
 from vodkabets.forms.register_form import RegisterForm
+
+from vodkabets.games.crash import crash_blueprint, CrashGame
 
 from vodkabets.models.base_model import set_model_database
 from vodkabets.models.user import User
@@ -16,6 +21,16 @@ from vodkabets.misc.redirect import safe_redirect
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_json("config.json")
+
+# SocketIO
+socket = SocketIO(app)
+
+# init chat
+chat = Chat(socket, max_length=app.config.get("MAX_CHAT_MESSAGE_LENGTH"))
+
+# Init games
+crash = CrashGame(socket)
+app.register_blueprint(crash_blueprint, url_prefix="/crash")
 
 # initialize database
 db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
@@ -39,6 +54,11 @@ def get_user(token):
     else:
         return None
 
+@app.before_first_request
+def run_on_start():
+    # Start games
+    crash.start()
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -56,7 +76,7 @@ def register():
 
     form = RegisterForm(request.form)
     if form.validate_on_submit():
-        username = form.username.data
+        username = Markup.escape(form.username.data)
         if not User.select().where(User.username == username).exists():
             # password is auto-salted
             password = generate_password_hash(form.password.data, salt_length=app.config.get("SALT_LENGTH"))
@@ -107,4 +127,4 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run()
+    socket.run(app)
