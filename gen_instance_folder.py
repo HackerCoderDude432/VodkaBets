@@ -39,7 +39,7 @@ with open(os.path.join(instance_folder, "config.json"), "w") as cfg:
 
     print("Do you want to autogenerate a secret key?")
     if input("type 'yes' to generate one: ").lower() == "yes":
-        key = token_urlsafe()
+        key = "'" + token_urlsafe() + "'"
         print("Set secret key as random string")
     else:
         key = "<enter_secret_key_here>"
