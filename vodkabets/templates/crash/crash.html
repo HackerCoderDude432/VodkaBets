@@ -1,10 +1,130 @@
 {% extends 'layout.html' %}
 
 {% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/crash/css/style.css">
   <script src="/static/crash/js/crash.js"></script>
 {% endblock %}
 
 {% block main %}
-  <h1>Crash!</h1>
-  <p>Under Construction</p>
+  <div class="crash">
+    {# Left #}
+    <div class="crash_column">
+
+      {# Header #}
+      <div class="crash_ui_panel">
+        <div class="crash_ui_header">
+          <b>Vodka Bets Crash</b>
+        </div>
+      </div><br>
+
+      {# Crash Canvas #}
+      <div class="crash_canvas_container">
+        <img class="crash_canvas" src="/static/crash/images/graph.png"></img>
+      </div><br>
+
+      {# If the user isn't logged in, don't show betting player or player info #}
+      {% if current_user.is_authenticated %}
+        {# Betting Panel #}
+        <div class="crash_ui_panel">
+          {# Indications to tell which mode the betting panel is on #}
+          <div class="crash_ui_header">
+            <span>Betting/Cashout</span>
+          </div>
+
+          <div style="padding:5px;">
+            {# Betting Field #}
+            <div style="padding:5px;">
+              <input id="crash_bet_field" style="width:80%;" type="number" value="{{ config['CRASH_MIN_BET'] }}" min="{{ config['CRASH_MIN_BET'] }}"></input>
+              <span>vlads</span>
+            </div>
+
+            {# Bet helper buttons #}
+            <div style="padding:5px;">
+              <button id="crash_half" class="crash_multiplier_button">1/2</button>
+              <button id="crash_2x" class="crash_multiplier_button">2x</button>
+              <button id="crash_min" class="crash_multiplier_button">MIN</button>
+              <button id="crash_max" class="crash_multiplier_button">MAX</button>
+            </div>
+
+            {# Bet submittion button#}
+            <div style="padding:5px;">
+              <button id="crash_submit_bet"><b style="text-align:justify;">Place Bet</b></button>
+            </div>
+          </div>
+        </div><br>
+
+        {# Player Info Panel #}
+        <div class="crash_ui_panel">
+          <div class="crash_ui_header">
+            <span>Player</span>
+          </div>
+
+          <div class="crash_seperator">
+            <b style="font-size: 18px;">{{current_user.username}}</b>
+            <br>
+            <span style="font-size: 14px;">Lvl: null</span>
+          </div>
+
+          <div class="crash_seperator">
+            <b>Next Level:</b>
+            <span><i>1000 exp</i></span>
+            <progress value="22" max="100"></progress>
+            <span><b>100000 exp</b></span>
+          </div>
+
+          <div class="crash_seperator">
+            <img src="/static/images/vlads.png" width="25px;" height="20px"></img>
+            <span>{{current_user.vlads}} vlads</span>
+
+            <span style="float: right;"><button onclick="$(location).attr('href', '/dashboard')">Dashboard</button></span>
+          </div>
+        </div>
+      {% else %}
+        {# Show this message as a replacement #}
+        <div class="crash_ui_panel" style="height: 400px;">
+          <div class="crash_ui_header">
+            <span>Signup or Login to Bet!</span>
+          </div>
+
+          <div style="padding:5px;">
+            <h1 style="text-align: center;word-wrap: break-word;">Lol you don't have an account XDDDDDDDDDDDDDDd!!1!</h1>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Right #}
+    <div class="crash_column">
+
+      {# History #}
+      <div class="crash_ui_panel">
+        <div class="crash_ui_header">
+          History
+        </div>
+
+        asdasd
+      </div><br>
+
+      {# Placed Bets List #}
+      <div class="crash_ui_panel" style="flex: 2;">
+        <div class="crash_ui_header">
+          <span>Placed Bets (Global)</span>
+        </div>
+
+        <div style="padding:5px;">
+          <table class="crash_bets_list">
+            <tr>
+              <th>Username</th>
+              <th>@</th>
+              <th>Bet</th>
+              <th>$</th>
+            </tr>
+            <tr>
+              <td>Loading...</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

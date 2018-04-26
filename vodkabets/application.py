@@ -15,6 +15,7 @@ from vodkabets.forms.register_form import RegisterForm
 from vodkabets.games.crash import crash_blueprint, CrashGame
 
 from vodkabets.models.base_model import set_model_database
+from vodkabets.models.record import Record
 from vodkabets.models.user import User
 
 from vodkabets.misc.redirect import safe_redirect
@@ -35,7 +36,7 @@ app.register_blueprint(crash_blueprint, url_prefix="/crash")
 # initialize database
 db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
 set_model_database(db) # Assign this table to the base model
-db.create_tables([User])
+db.create_tables([User, Record])
 
 # Init flask_login
 login_man = LoginManager()
@@ -53,11 +54,6 @@ def get_user(token):
         return query.get()
     else:
         return None
-
-@app.before_first_request
-def run_on_start():
-    # Start games
-    crash.start()
 
 @app.route("/")
 def index():
@@ -86,7 +82,7 @@ def register():
             while User.select().where(User.session_token == new_token).exists():
                 new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
 
-            User.create(username=username, password=password, session_token=new_token)
+            User.create(username=username, password=password, session_token=new_token, vlads=app.config.get("STARTING_VLADS"), client_seed=None)
             flash("Registered user!", "SUCCESS")
             return redirect("/login")
         else:

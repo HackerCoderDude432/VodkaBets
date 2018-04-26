@@ -8,7 +8,7 @@
 
     {% block head %}{% endblock %}
 
-    {# Chat toggle script #}
+    {# Chat script #}
     <script src="/static/js/chat.js"></script>
   </head>
   <body>
@@ -18,11 +18,12 @@
       {# Menu Bar #}
       <div class="menubar">
         {# Logo (Which also redirects back to the main page) #}
-        <img src="/static/images/logo.png" style="max-width:100%;max-height:100%;" alt="WTF! What ancient browser are you using that can't display images????"></img>
+        <img src="/static/images/logo.png" style="max-width:100%;max-height:100%;"></img>
 
         {# Top Buttons #}
         <div style="flex: 2;padding: 5px;">
           <button class="menubutton" type="button" onclick="$(location).attr('href', '/')">Home</button>
+          <button class="menubutton" type="button" onclick="$(location).attr('href', '/crash')">Crash</button>
         </div>
         {# Bottom Buttons #}
         <div style="padding: 5px;">
@@ -39,7 +40,7 @@
       </div>
 
       {# Main Content #}
-      <div style="flex: 1 1 auto; padding: 10px;">
+      <div style="flex: 1 1 auto; padding: 10px; overflow:auto;">
         {% block main %}{% endblock %}
       </div>
 
@@ -59,7 +60,7 @@
                 <i>Messages will appear here!</i><br>
               </div>
               <div class="chat_form">
-                <textarea id="chat_input" class="chat_input" placeholder="Type something in chat..." rows="3" maxlength="255"></textarea>
+                <textarea id="chat_input" class="chat_input" placeholder="Type something in chat..." rows="3" maxlength="{{ config['MAX_CHAT_MESSAGE_LENGTH'] }}"></textarea>
                 <button id="chat_send">Send</button>
               </div>
             {% else %}

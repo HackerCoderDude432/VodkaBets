@@ -9,10 +9,6 @@ chatSocket.on("process_message", (user, message) => {
   $('#chat_main').scrollTop($('#chat_main')[0].scrollHeight - $('#chat_main')[0].clientHeight)
 })
 
-chatSocket.on("flash", (message, catagory) => {
-  flash(message, catagory)
-})
-
 $(document).ready(function() {
   // Code that submits the message to the server
   $("#chat_send").click(function() {
@@ -29,5 +25,5 @@ $(document).ready(function() {
       e.preventDefault()
       $('#chat_send').click();
     }
-  });
+  })
 })

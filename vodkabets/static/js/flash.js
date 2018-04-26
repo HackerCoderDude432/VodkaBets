@@ -1,3 +1,9 @@
+var flashSocket = io.connect("/")
+
+flashSocket.on("flash", (message, catagory) => {
+  flash(message, catagory)
+})
+
 toastr.options = {
   "closeButton": true,
   "debug": false,
