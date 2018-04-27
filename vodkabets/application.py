@@ -82,7 +82,7 @@ def dashboard():
 @app.route("/register", methods=["GET","POST"])
 def register():
     if current_user.is_authenticated:
-        flash("Already logged in!", "INFO")
+        flash("Already logged in!", "WARNING")
         return redirect("/dashboard")
 
     form = RegisterForm(request.form)
@@ -138,7 +138,7 @@ def register():
 @app.route("/login", methods=["GET","POST"])
 def login():
     if current_user.is_authenticated:
-        flash("Already logged in!", "INFO")
+        flash("Already logged in!", "WARNING")
         return redirect("/dashboard")
 
     form = LoginForm(request.form)
@@ -179,6 +179,11 @@ if app.config["ENABLE_MAIL"]:
             query = User.select().where(User.session_token == user_sid)
             if query.exists():
                 user = query.get() # get user as they exist
+
+                # Check if already verified, if so throw a hissy fit
+                if user.verified_email == True:
+                    flash("User is already verified!", "INFO")
+                    return redirect("/")
 
                 # Verify the email and invalidate the old session token
                 # (recursivly) generate first session token
