@@ -24,6 +24,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from vodkabets.chat import Chat
 
 from vodkabets.forms.login_form import LoginForm
+from vodkabets.forms.password_reset_form import PasswordResetForm
 from vodkabets.forms.register_form import RegisterForm
 
 from vodkabets.games.crash import crash_blueprint, CrashGame
@@ -118,7 +119,7 @@ def register():
 
             # generate an email verification link and send it (if enabled)
             if app.config["ENABLE_MAIL"]:
-                serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"])
+                serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"], salt="email_verification")
                 verification_token = serializer.dumps(new_token)
                 verification_url = request.url_root + "/verify/" + verification_token
 
@@ -162,12 +163,13 @@ def login():
 
 # Only include the verify endpoint if mail is enabled
 if app.config["ENABLE_MAIL"]:
+
     @app.route("/verify/<token>")
     def verify_email(token):
-        serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"])
+        serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"], salt="email_verification")
 
         try:
-            user_sid = serializer.loads(s=token,max_age=None)
+            user_sid = serializer.loads(s=token,max_age=int(app.config["MAX_EMAIL_VERIFICATION_AGE"]))
         except BadTimeSignature:
             flash("Invalid Token sent!", "ERROR")
             return redirect("/")
@@ -202,6 +204,63 @@ if app.config["ENABLE_MAIL"]:
                 flash("User does not exist!", "ERROR")
 
         return redirect("/")
+
+    @app.route("/reset/<token>")
+    def verify_email(token):
+        # form submit
+        form = PasswordResetForm(request.form)
+        if form.validate_on_submit():
+            # check if user exists
+            query = User.select().where(User.session_token == form.user_sid.data)
+            if query.exists():
+                user = query.get() # get user as they exist
+
+                # change the password and invalidate the old session token
+
+                # change the password
+                password = generate_password_hash(form.password.data, salt_length=app.config.get("SALT_LENGTH"))
+
+                # (recursivly) generate first session token
+                new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
+                while User.select().where(User.session_token == new_token).exists():
+                    new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
+
+                # apply the changes
+                user.password = password
+                user.session_token = new_token
+                user.save()
+
+                flash("Password sucessfully reset! Please login...", "SUCCESS")
+                return redirect("/login")
+            else:
+                flash("User does not exist!", "ERROR")
+                return redirect("/")
+        else:
+            # Generate a password_reset_form if token is valid
+            serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"], salt="password_reset")
+
+            try:
+                user_sid = serializer.loads(s=token,max_age=app.config["MAX_PASSWORD_RESET_AGE"])
+            except BadTimeSignature:
+                flash("Invalid Token sent!", "ERROR")
+                return redirect("/")
+            except SignatureExpired:
+                flash("The token has expired! Try resending the message...", "ERROR")
+                return redirect("/")
+            else:
+                # check if user exists
+                query = User.select().where(User.session_token == user_sid)
+                if query.exists():
+                    user = query.get() # get user as they exist
+
+                    # set the hidden field
+                    form.user_sid.data = user.session_token
+
+                    # render the password_reset.html file
+                    return render_template("password_reset.html", form=form)
+                else:
+                    flash("User does not exist!", "ERROR")
+                    return redirect("/")
 
 @app.route("/logout")
 @login_required
