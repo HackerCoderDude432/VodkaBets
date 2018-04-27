@@ -13,13 +13,11 @@
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirmation) }}
-    <br>
 
     {# Recaptcha (if enabled) #}
     {% if config["ENABLE_RECAPTCHA"] %}
-      {{ form.recaptcha }}
+      <br>{{ form.recaptcha }}<br>
     {% endif %}
-    <br>
 
     <input type="submit" class="btn btn-primary" value="Submit">
   </form>
