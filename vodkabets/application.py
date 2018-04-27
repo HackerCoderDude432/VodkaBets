@@ -132,7 +132,7 @@ def register():
             flash("Registered user!", "SUCCESS")
             return redirect("/login")
         else:
-            flash("Username Already Registered!", "ERROR")
+            flash("Username Already Registered! Do you want to <a href='/login'>login?</a>", "INFO")
 
     return render_template("register.html", form=form)
 
