@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 
+{% block head %}
+  <script src='//www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block main %}
   <h1>Register</h1>
   {% from "includes/_formhelpers.html" import render_field %}
@@ -8,6 +12,14 @@
     {{ render_field(form.username) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirmation) }}
-    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+    <br>
+
+    {# Recaptcha (if enabled) #}
+    {% if config["ENABLE_RECAPTCHA"] %}
+      {{ form.recaptcha }}
+    {% endif %}
+    <br>
+
+    <input type="submit" class="btn btn-primary" value="Submit">
   </form>
 {% endblock %}

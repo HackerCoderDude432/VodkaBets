@@ -1,9 +1,13 @@
-from peewee import DateTimeField, FloatField, PrimaryKeyField, TextField
-from vodkabets.models.base_model import BaseModel
+from peewee import DateTimeField, FloatField, Model, PrimaryKeyField, TextField
 
-class Record(BaseModel):
+from vodkabets.application import db
+
+class Record(Model):
     id = PrimaryKeyField()
     time_gen = DateTimeField()
     crash_point = FloatField()
     computed_hash = TextField()
     combined_client_hashes = TextField()
+
+    class Meta:
+        database = db

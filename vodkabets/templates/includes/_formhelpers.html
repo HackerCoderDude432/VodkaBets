@@ -1,4 +1,4 @@
-{% macro render_field(field, length=25, one_line=False) %}
+{% macro render_field(field, length=25, one_line=False, add_new_line=True) %}
   {{ field.label }}
   {% if not one_line %}
     <br>
@@ -9,5 +9,7 @@
       <span> {{ error }}</span>
     {% endfor %}
   {% endif %}
-  <br>
+  {% if add_new_line %}
+    <br>
+  {% endif %}
 {% endmacro %}

@@ -1,10 +1,12 @@
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, render_template, request
 from flask_login import current_user
 from flask_socketio import emit, Namespace
 
 from base64 import urlsafe_b64encode
 from copy import deepcopy
 from json import dumps
+
+from vodkabets.application import app
 
 from vodkabets.models.record import Record
 from vodkabets.models.user import User
@@ -54,7 +56,7 @@ class CrashGame(Namespace):
                 return
 
             # Be sure bet is a valid amount
-            if bet_amount < current_app.config["CRASH_MIN_BET"]:
+            if bet_amount < app.config["CRASH_MIN_BET"]:
                 emit("flash", ("Bet is below minimum requirement!", "ERROR"), namespace="/", room=request.sid)
                 return
             elif bet_amount > current_user.vlads:

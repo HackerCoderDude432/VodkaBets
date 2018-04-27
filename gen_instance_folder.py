@@ -11,7 +11,12 @@ config = \
   "SALT_LENGTH": 15,
   "MAX_CHAT_MESSAGE_LENGTH": 255,
   "STARTING_VLADS": 500,
-  "CRASH_MIN_BET": 10
+  "CRASH_MIN_BET": 10,
+  "ENABLE_RECAPTCHA": false,
+  "RECAPTCHA_USE_SSL": false,
+  "RECAPTCHA_PUBLIC_KEY": "<enter recaptcha public key here!>",
+  "RECAPTCHA_PRIVATE_KEY": "<enter recaptcha private key here!>",
+  "RECAPTCHA_DATA_ATTRS": {{"theme": "light"}}
 }}"""
 
 import os

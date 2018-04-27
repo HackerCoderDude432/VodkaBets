@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 
+{% block head %}
+  <script src='//www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block main %}
   <h1>Login</h1>
   {% from "includes/_formhelpers.html" import render_field %}
@@ -7,7 +11,15 @@
     {{ form.csrf_token }}
     {{ render_field(form.username) }}
     {{ render_field(form.password) }}
-    {{ render_field(form.remember_me, one_line=True) }}
-    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+    <br>
+
+    {# Recaptcha (if enabled) #}
+    {% if config["ENABLE_RECAPTCHA"] %}
+      {{ form.recaptcha }}
+    {% endif %}
+    <br>
+
+    {{ render_field(form.remember_me, one_line=True, add_new_line=False) }}
+    <input type="submit" class="btn btn-primary" value="Submit">
   </form>
 {% endblock %}

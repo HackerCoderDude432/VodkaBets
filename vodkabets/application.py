@@ -1,9 +1,21 @@
 import os
 
-from flask import Flask, flash, Markup, redirect, render_template, request
+from flask import Flask
+from peewee import SqliteDatabase
+
+# INIT THE APP AND DATABASE BEFORE EVERYTHING IS IMPORTED
+
+# App
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_json("config.json")
+
+# database
+db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
+
+from flask import flash, Markup, redirect, render_template, request
+from flask_gravatar import Gravatar
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from flask_socketio import SocketIO
-from peewee import SqliteDatabase
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -14,14 +26,13 @@ from vodkabets.forms.register_form import RegisterForm
 
 from vodkabets.games.crash import crash_blueprint, CrashGame
 
-from vodkabets.models.base_model import set_model_database
 from vodkabets.models.record import Record
 from vodkabets.models.user import User
 
 from vodkabets.misc.redirect import safe_redirect
 
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_json("config.json")
+# initialize database
+db.create_tables([User, Record])
 
 # SocketIO
 socket = SocketIO(app)
@@ -33,11 +44,6 @@ chat = Chat(socket, max_length=app.config.get("MAX_CHAT_MESSAGE_LENGTH"))
 crash = CrashGame(socket)
 app.register_blueprint(crash_blueprint, url_prefix="/crash")
 
-# initialize database
-db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
-set_model_database(db) # Assign this table to the base model
-db.create_tables([User, Record])
-
 # Init flask_login
 login_man = LoginManager()
 login_man.login_view = "/login"
@@ -45,6 +51,9 @@ login_man.login_message = "Please login to continue!"
 login_man.login_message_category = "ERROR"
 login_man.session_protection = "strong"
 login_man.init_app(app)
+
+# Gravatar icons
+gravatar = Gravatar(app)
 
 @login_man.user_loader
 def get_user(token):
@@ -67,7 +76,7 @@ def dashboard():
 @app.route("/register", methods=["GET","POST"])
 def register():
     if current_user.is_authenticated:
-        flash("Already logged in!", "ERROR")
+        flash("Already logged in!", "INFO")
         return redirect("/dashboard")
 
     form = RegisterForm(request.form)
@@ -93,7 +102,7 @@ def register():
 @app.route("/login", methods=["GET","POST"])
 def login():
     if current_user.is_authenticated:
-        flash("Already logged in!", "ERROR")
+        flash("Already logged in!", "INFO")
         return redirect("/dashboard")
 
     form = LoginForm(request.form)

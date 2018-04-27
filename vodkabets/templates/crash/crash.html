@@ -60,11 +60,13 @@
           </div>
 
           <div class="crash_seperator">
+            {# Gravatar avatar #}
+            <img style="height:40px;float:left;margin-right:5px;" src="{{ 'zzz@gmail.com' | gravatar }}"></img>
+
             <b style="font-size: 18px;">{{current_user.username}}</b>
             <br>
             <span style="font-size: 14px;">Lvl: null</span>
           </div>
-
           <div class="crash_seperator">
             <b>Next Level:</b>
             <span><i>1000 exp</i></span>
@@ -76,7 +78,9 @@
             <img src="/static/images/vlads.png" width="25px;" height="20px"></img>
             <span>{{current_user.vlads}} vlads</span>
 
-            <span style="float: right;"><button onclick="$(location).attr('href', '/dashboard')">Dashboard</button></span>
+            <span style="float: right;">
+              <button class="crash_profile_button" onclick="$(location).attr('href', '/dashboard')">Dashboard</button>
+            </span>
           </div>
         </div>
       {% else %}
