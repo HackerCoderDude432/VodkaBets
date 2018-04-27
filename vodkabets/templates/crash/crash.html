@@ -61,7 +61,7 @@
 
           <div class="crash_seperator">
             {# Gravatar avatar #}
-            <img style="height:40px;float:left;margin-right:5px;" src="{{ 'zzz@gmail.com' | gravatar }}"></img>
+            <img style="height:40px;float:left;margin-right:5px;" src="{{ current_user.email | gravatar }}"></img>
 
             <b style="font-size: 18px;">{{current_user.username}}</b>
             <br>

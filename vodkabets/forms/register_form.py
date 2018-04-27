@@ -4,7 +4,8 @@ from wtforms import StringField, PasswordField, validators
 from vodkabets.application import app
 
 class RegisterForm(FlaskForm):
-    username = StringField("Username", [validators.Length(min=1, max=25)])
+    username = StringField("Username", [validators.Length(min=1, max=app.config["MAX_USERNAME_LENGTH"])])
+    email = StringField("Email", [validators.Email()])
     password = PasswordField("Password", [
         validators.DataRequired(),
         validators.EqualTo("confirmation", message="Passwords do not match")

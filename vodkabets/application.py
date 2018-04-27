@@ -15,7 +15,9 @@ db = SqliteDatabase(os.path.join(app.instance_path, "users.db"))
 from flask import flash, Markup, redirect, render_template, request
 from flask_gravatar import Gravatar
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
+from flask_mail import Mail, Message
 from flask_socketio import SocketIO
+from itsdangerous import BadTimeSignature, SignatureExpired, URLSafeTimedSerializer
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -52,6 +54,10 @@ login_man.login_message_category = "ERROR"
 login_man.session_protection = "strong"
 login_man.init_app(app)
 
+# Flask-Mail
+if app.config["ENABLE_MAIL"]:
+    mail = Mail(app)
+
 # Gravatar icons
 gravatar = Gravatar(app)
 
@@ -81,6 +87,10 @@ def register():
 
     form = RegisterForm(request.form)
     if form.validate_on_submit():
+        # check username length
+        if len(form.username.data) > app.config["MAX_USERNAME_LENGTH"]:
+            flash("Username is too long!", "ERROR")
+
         username = Markup.escape(form.username.data)
         if not User.select().where(User.username == username).exists():
             # password is auto-salted
@@ -91,7 +101,33 @@ def register():
             while User.select().where(User.session_token == new_token).exists():
                 new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
 
-            User.create(username=username, password=password, session_token=new_token, vlads=app.config.get("STARTING_VLADS"), client_seed=None)
+            vars = {
+                "username": username,
+                "email": form.email.data,
+                "password": password,
+                "session_token": new_token,
+                "vlads": app.config.get("STARTING_VLADS"),
+                "client_seed": None
+            }
+
+            # Only add the verified_email boolean if mail is on
+            if app.config["ENABLE_MAIL"]:
+                vars["verified_email"] = False
+
+            User.create(**vars)
+
+            # generate an email verification link and send it (if enabled)
+            if app.config["ENABLE_MAIL"]:
+                serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"])
+                verification_token = serializer.dumps(new_token)
+                verification_url = request.url_root + "/verify/" + verification_token
+
+                msg = Message(subject="VodkaBets Verification")
+                msg.add_recipient(form.email.data)
+                msg.html = open(os.path.join(app.root_path, "assets", "verify_email.html"), "r").read().format(username, verification_url)
+
+                mail.send(msg)
+
             flash("Registered user!", "SUCCESS")
             return redirect("/login")
         else:
@@ -123,6 +159,44 @@ def login():
         flash("Invalid credentials!", "ERROR")
 
     return render_template("login.html", form=form)
+
+# Only include the verify endpoint if mail is enabled
+if app.config["ENABLE_MAIL"]:
+    @app.route("/verify/<token>")
+    def verify_email(token):
+        serializer = URLSafeTimedSerializer(secret_key=app.config["SECRET_KEY"])
+
+        try:
+            user_sid = serializer.loads(s=token,max_age=None)
+        except BadTimeSignature:
+            flash("Invalid Token sent!", "ERROR")
+            return redirect("/")
+        except SignatureExpired:
+            flash("The token has expired! Try resending the message...", "ERROR")
+            return redirect("/")
+        else:
+            # check if user exists
+            query = User.select().where(User.session_token == user_sid)
+            if query.exists():
+                user = query.get() # get user as they exist
+
+                # Verify the email and invalidate the old session token
+                # (recursivly) generate first session token
+                new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
+                while User.select().where(User.session_token == new_token).exists():
+                    new_token = token_urlsafe(app.config.get("SESSION_TOKEN_LENGTH"))
+
+                # apply the changes
+                user.verified_email = True
+                user.session_token = new_token
+                user.save()
+
+                flash("Sucessfully verified your account! Please relog to contine...", "SUCCESS")
+                return redirect("/login")
+            else:
+                flash("User does not exist!", "ERROR")
+
+        return redirect("/")
 
 @app.route("/logout")
 @login_required
