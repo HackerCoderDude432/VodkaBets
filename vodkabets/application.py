@@ -205,8 +205,12 @@ if app.config["ENABLE_MAIL"]:
 
         return redirect("/")
 
+    @app.route("/reset/")
+    def submit_password_reset():
+
+
     @app.route("/reset/<token>")
-    def verify_email(token):
+    def reset_password(token):
         # form submit
         form = PasswordResetForm(request.form)
         if form.validate_on_submit():
